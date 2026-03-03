@@ -7,24 +7,20 @@
     <title>Groundwater Discovery Portal — WASHways</title>
     <meta name="description"
         content="A remote-sensing screening tool for groundwater potential mapping in data-scarce regions. Uses MERIT Hydro, SoilGrids, Sentinel-2, and Aridity Index to produce a 0–10 Groundwater Potential Index.">
-
-    <!-- Open Graph -->
     <meta property="og:title" content="Groundwater Discovery Portal — WASHways">
     <meta property="og:description"
         content="Screen for groundwater potential using satellite-derived Storage, Supply, and Yield pillars with a terrain constraint — all in your browser.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://washways.org/groundwaterdiscoveryportal/">
-
-    <!-- Twitter Card -->
+    <meta property="og:url" content="https://washways.org/GroundwaterDiscoveryPortal/">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Groundwater Discovery Portal — WASHways">
     <meta name="twitter:description"
         content="Remote-sensing groundwater potential screening tool powered by Google Earth Engine.">
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
     <style>
         *,
         *::before,
@@ -32,6 +28,12 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+        }
+
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
         }
 
         :root {
@@ -55,104 +57,151 @@
             background: var(--bg);
             color: var(--text);
             line-height: 1.6;
-            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
-        /* Hero */
-        .hero {
-            position: relative;
-            padding: 40px 24px 30px;
-            text-align: center;
-            background: linear-gradient(180deg, #0f1b35 0%, var(--bg) 100%);
-            overflow: hidden;
+        /* ── Top bar ── */
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 20px;
+            background: linear-gradient(135deg, #0f1b35, var(--bg));
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+            z-index: 10;
         }
 
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: -120px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 700px;
-            height: 700px;
-            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
-            pointer-events: none;
-        }
-
-        .hero h1 {
-            font-size: clamp(2rem, 5vw, 3.2rem);
+        .topbar h1 {
+            font-size: 1.15rem;
             font-weight: 800;
-            letter-spacing: -0.02em;
-            margin-bottom: 12px;
             background: linear-gradient(135deg, var(--accent), #818cf8);
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        .hero .subtitle {
-            font-size: 1.15rem;
-            color: var(--text-muted);
-            max-width: 680px;
-            margin: 0 auto 32px;
+        .topbar-links {
+            display: flex;
+            gap: 16px;
+            align-items: center;
         }
 
-        .launch-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            padding: 16px 40px;
-            font-size: 1.1rem;
+        .topbar-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.82rem;
+            transition: color 0.2s;
+        }
+
+        .topbar-links a:hover {
+            color: var(--accent);
+        }
+
+        .launch-pill {
+            padding: 5px 16px;
+            font-size: 0.8rem;
             font-weight: 700;
             color: #fff;
             background: linear-gradient(135deg, var(--accent), #6366f1);
             border: none;
             border-radius: 50px;
             text-decoration: none;
-            cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
-            box-shadow: 0 4px 24px rgba(56, 189, 248, 0.3);
         }
 
-        .launch-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 32px rgba(56, 189, 248, 0.45);
+        .launch-pill:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(56, 189, 248, 0.3);
         }
 
-        .launch-btn svg {
-            width: 20px;
-            height: 20px;
-            fill: currentColor;
-        }
-
-        .secondary-links {
-            margin-top: 18px;
+        /* ── Splitter layout ── */
+        .split-container {
+            flex: 1;
             display: flex;
-            justify-content: center;
-            gap: 24px;
-            flex-wrap: wrap;
+            flex-direction: column;
+            overflow: hidden;
         }
 
-        .secondary-links a {
+        .map-pane {
+            position: relative;
+            overflow: hidden;
+            background: var(--surface);
+        }
+
+        .map-pane iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        .map-fallback {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 6px 20px;
+            background: rgba(19, 26, 46, 0.92);
+            backdrop-filter: blur(6px);
+            text-align: center;
+            font-size: 0.82rem;
             color: var(--text-muted);
-            text-decoration: none;
-            font-size: 0.9rem;
-            transition: color 0.2s;
+            z-index: 5;
         }
 
-        .secondary-links a:hover {
+        .map-fallback a {
             color: var(--accent);
+            text-decoration: none;
         }
 
-        /* Container */
+        /* ── Drag handle ── */
+        .splitter {
+            height: 8px;
+            background: var(--surface-alt);
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            cursor: row-resize;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            transition: background 0.15s;
+        }
+
+        .splitter:hover,
+        .splitter.active {
+            background: rgba(56, 189, 248, 0.15);
+        }
+
+        .splitter-grip {
+            width: 40px;
+            height: 3px;
+            border-radius: 2px;
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .splitter:hover .splitter-grip {
+            background: var(--accent);
+        }
+
+        /* ── Content pane ── */
+        .content-pane {
+            overflow-y: auto;
+            background: var(--bg);
+            scroll-behavior: smooth;
+        }
+
         .container {
-            max-width: 900px;
+            max-width: 960px;
             margin: 0 auto;
-            padding: 0 24px;
+            padding: 0 28px;
         }
 
-        /* Sections */
         section {
-            padding: 60px 0;
+            padding: 48px 0;
         }
 
         section+section {
@@ -160,51 +209,66 @@
         }
 
         section h2 {
-            font-size: 1.6rem;
+            font-size: 1.5rem;
             font-weight: 700;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             letter-spacing: -0.01em;
         }
 
-        /* App embed — full-bleed */
-        .embed-section {
-            padding: 0;
-            display: flex;
-            flex-direction: column;
+        section h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 24px 0 10px;
+            color: var(--text);
         }
 
-        .embed-fallback {
-            padding: 10px 24px;
-            text-align: center;
+        section h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin: 18px 0 8px;
             color: var(--text-muted);
-            font-size: 0.9rem;
-            background: var(--surface);
-            border-bottom: 1px solid var(--border);
         }
 
-        .embed-fallback a {
+        p,
+        li {
+            color: var(--text-muted);
+            font-size: 0.92rem;
+            line-height: 1.7;
+        }
+
+        p+p {
+            margin-top: 12px;
+        }
+
+        ul,
+        ol {
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 6px;
+        }
+
+        /* ── Formula blocks ── */
+        .formula {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 14px 18px;
+            margin: 12px 0;
             color: var(--accent);
+            overflow-x: auto;
+            white-space: pre;
+            line-height: 1.65;
         }
 
-        .embed-wrapper {
-            flex: 1;
-            overflow: hidden;
-            background: var(--surface);
-        }
-
-        .embed-wrapper iframe {
-            width: 100%;
-            height: calc(100vh - 60px);
-            min-height: 500px;
-            border: none;
-            display: block;
-        }
-
-        /* Pillar cards */
+        /* ── Pillar cards ── */
         .pillar-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
             margin-top: 16px;
         }
 
@@ -212,12 +276,12 @@
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: var(--radius);
-            padding: 24px;
+            padding: 20px;
             transition: border-color 0.3s, transform 0.2s;
         }
 
         .pillar-card:hover {
-            transform: translateY(-3px);
+            transform: translateY(-2px);
             border-color: rgba(255, 255, 255, 0.15);
         }
 
@@ -230,30 +294,59 @@
         }
 
         .pillar-card h3 {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 8px;
+            font-size: 1rem;
+            margin: 0 0 8px;
             display: flex;
             align-items: center;
         }
 
         .pillar-card p {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            line-height: 1.5;
+            font-size: 0.85rem;
         }
 
-        /* Score table */
+        /* ── Weight table ── */
+        .weight-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0;
+            font-size: 0.85rem;
+        }
+
+        .weight-table th,
+        .weight-table td {
+            padding: 10px 14px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .weight-table th {
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .weight-table .swatch {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        /* ── Score table ── */
         .score-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 16px;
-            font-size: 0.9rem;
+            margin: 12px 0;
+            font-size: 0.88rem;
         }
 
         .score-table th,
         .score-table td {
-            padding: 12px 16px;
+            padding: 11px 14px;
             text-align: left;
             border-bottom: 1px solid var(--border);
         }
@@ -261,7 +354,7 @@
         .score-table th {
             color: var(--text-muted);
             font-weight: 600;
-            font-size: 0.8rem;
+            font-size: 0.78rem;
             text-transform: uppercase;
             letter-spacing: 0.04em;
         }
@@ -275,37 +368,58 @@
             vertical-align: middle;
         }
 
-        /* Data sources */
+        /* ── Data list ── */
         .data-list {
             list-style: none;
-            margin-top: 16px;
+            margin-top: 14px;
+            padding: 0;
         }
 
         .data-list li {
-            padding: 14px 0;
+            padding: 12px 0;
             border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: baseline;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 6px;
         }
 
         .data-list .name {
             font-weight: 600;
+            color: var(--text);
         }
 
         .data-list .meta {
             color: var(--text-muted);
-            font-size: 0.85rem;
+            font-size: 0.82rem;
         }
 
-        /* Footer */
+        /* ── Callout ── */
+        .callout {
+            background: var(--surface);
+            border-left: 3px solid var(--accent);
+            border-radius: 0 8px 8px 0;
+            padding: 14px 18px;
+            margin: 16px 0;
+            font-size: 0.88rem;
+            color: var(--text-muted);
+        }
+
+        .callout.warn {
+            border-left-color: var(--constraint);
+        }
+
+        .callout strong {
+            color: var(--text);
+        }
+
+        /* ── Footer ── */
         footer {
-            padding: 40px 24px;
+            padding: 32px 24px;
             text-align: center;
             color: var(--text-muted);
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             border-top: 1px solid var(--border);
         }
 
@@ -315,194 +429,526 @@
         }
 
         @media (max-width: 600px) {
-            .hero {
-                padding: 32px 16px 20px;
+            .topbar {
+                padding: 6px 12px;
+            }
+
+            .topbar h1 {
+                font-size: 0.95rem;
+            }
+
+            .container {
+                padding: 0 16px;
             }
 
             section {
-                padding: 40px 0;
-            }
-
-            .embed-wrapper iframe {
-                height: calc(100vh - 50px);
-                min-height: 400px;
+                padding: 32px 0;
             }
         }
     </style>
 </head>
 
 <body>
-
-    <!-- Hero -->
-    <header class="hero">
+    <!-- Top bar -->
+    <div class="topbar">
         <h1>Groundwater Discovery Portal</h1>
-        <p class="subtitle">
-            A satellite-powered screening tool for mapping groundwater potential in data-scarce regions.
-            Combines topography, climate, soil, vegetation, and structural proxies into a single 0–10 index.
-        </p>
-        <a href="https://washways.projects.earthengine.app/view/groundwaterdiscoveryportal" class="launch-btn"
-            target="_blank" rel="noopener">
-            <svg viewBox="0 0 24 24">
-                <path d="M8 5v14l11-7z" />
-            </svg>
-            Launch App
-        </a>
-        <div class="secondary-links">
-            <a href="https://github.com/washways/GroundwaterDiscoveryPortal" target="_blank">GitHub Repository</a>
+        <div class="topbar-links">
             <a href="#methodology">Methodology</a>
-            <a href="#data-sources">Data Sources</a>
-            <a href="#how-to-use">How to Use</a>
+            <a href="#interpretation">Scores</a>
+            <a href="#data-sources">Data</a>
+            <a href="https://github.com/washways/GroundwaterDiscoveryPortal" target="_blank">GitHub</a>
+            <a href="https://washways.projects.earthengine.app/view/groundwaterdiscoveryportal" class="launch-pill"
+                target="_blank">Open Full App ↗</a>
         </div>
-    </header>
+    </div>
 
-    <!-- Embedded App (full-width, full-height) -->
-    <section class="embed-section">
-        <p class="embed-fallback">
-            If the map doesn't load below, <a
-                href="https://washways.projects.earthengine.app/view/groundwaterdiscoveryportal" target="_blank">open
-                the app directly →</a>
-        </p>
-        <div class="embed-wrapper">
+    <!-- Split container -->
+    <div class="split-container" id="splitContainer">
+        <!-- Map pane -->
+        <div class="map-pane" id="mapPane">
             <iframe src="https://washways.projects.earthengine.app/view/groundwaterdiscoveryportal"
                 title="Groundwater Discovery Portal — Google Earth Engine App" loading="lazy" allow="geolocation"
                 sandbox="allow-scripts allow-same-origin allow-popups allow-forms">
             </iframe>
-        </div>
-    </section>
-
-    <!-- How to Use -->
-    <section id="how-to-use">
-        <div class="container">
-            <h2>How to Use</h2>
-            <ol style="padding-left:20px; color:var(--text-muted); font-size:0.95rem; line-height:2;">
-                <li><strong>Zoom in</strong> to a district or catchment (zoom level ≥ 9 recommended)</li>
-                <li>Adjust pillar <strong>weights</strong> if needed (Storage / Supply / Yield)</li>
-                <li>Set the <strong>dry-season NDVI month</strong> for your region (default: September for Malawi)</li>
-                <li>Click <strong>RUN</strong> to compute the Groundwater Potential Index</li>
-                <li><strong>Click any point</strong> on the map for a detailed diagnostic popup</li>
-                <li>Toggle <strong>pillar layers</strong> in the Layers panel to understand what drives the score</li>
-                <li>Enable <strong>Auto-stretch</strong> for better colour contrast at local scale</li>
-            </ol>
-        </div>
-    </section>
-
-    <!-- Methodology -->
-    <section id="methodology">
-        <div class="container">
-            <h2>Methodology: Source–Pathway–Receptor</h2>
-            <p style="color:var(--text-muted); margin-bottom:20px;">
-                The index combines three independently normalised pillars (0–1) using user-adjustable weights,
-                then applies a multiplicative terrain constraint. The final score ranges from 0 (very low) to 10
-                (exceptional).
-            </p>
-            <div class="pillar-grid">
-                <div class="pillar-card">
-                    <h3><span class="dot" style="background:var(--storage)"></span> Storage (Receptor)</h3>
-                    <p>Estimates saturated regolith thickness as <strong>DTB − HAND</strong>.
-                        Deep weathered rock below the drainage base-level means more aquifer volume.
-                        Log-normalised to 0–1.</p>
-                </div>
-                <div class="pillar-card">
-                    <h3><span class="dot" style="background:var(--supply)"></span> Supply (Source)</h3>
-                    <p>Combines <strong>Aridity Index</strong> (climate moisture surplus) with
-                        <strong>upstream drainage area</strong> (topographic water concentration).
-                        Wetter climate + larger catchment = more recharge.
-                    </p>
-                </div>
-                <div class="pillar-card">
-                    <h3><span class="dot" style="background:var(--yield)"></span> Yield (Pathway)</h3>
-                    <p>Blends five proxies: <strong>fracture lineaments</strong>, <strong>topographic
-                            convergence</strong>,
-                        <strong>dry-season NDVI</strong> (phreatophyte signal), <strong>soil transmissivity</strong>,
-                        and
-                        <strong>lithology factor</strong>.
-                    </p>
-                </div>
-                <div class="pillar-card">
-                    <h3><span class="dot" style="background:var(--constraint)"></span> Constraint (Penalty)</h3>
-                    <p>A <strong>multiplicative</strong> decay from slope and HAND.
-                        Steep rocky terrain → score collapses to zero, no matter how high the pillars.
-                        Rejects the "additive fallacy".</p>
-                </div>
+            <div class="map-fallback">
+                Map not loading? <a href="https://washways.projects.earthengine.app/view/groundwaterdiscoveryportal"
+                    target="_blank">Open the app directly →</a>
             </div>
         </div>
-    </section>
 
-    <!-- Score Interpretation -->
-    <section id="interpretation">
-        <div class="container">
-            <h2>Score Interpretation</h2>
-            <table class="score-table">
-                <thead>
-                    <tr>
-                        <th>Score</th>
-                        <th>Class</th>
-                        <th>Guidance</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><span class="swatch" style="background:#e51f1f"></span>0 – 2.0</td>
-                        <td>Very Low</td>
-                        <td>Low combined evidence. De-prioritise unless strong local knowledge exists.</td>
-                    </tr>
-                    <tr>
-                        <td><span class="swatch" style="background:#f2a134"></span>2.0 – 3.5</td>
-                        <td>Low</td>
-                        <td>Some signal, but weak. Use component layers + boreholes to justify.</td>
-                    </tr>
-                    <tr>
-                        <td><span class="swatch" style="background:#f7e379"></span>3.5 – 5.0</td>
-                        <td>Medium</td>
-                        <td>Promising. Identify the driving pillar(s) and verify locally.</td>
-                    </tr>
-                    <tr>
-                        <td><span class="swatch" style="background:#bbdb44"></span>5.0 – 6.2</td>
-                        <td>High</td>
-                        <td>Strong screening signal. Good candidate for field verification.</td>
-                    </tr>
-                    <tr>
-                        <td><span class="swatch" style="background:#44ce1b"></span>6.2 – 10</td>
-                        <td>Exceptional</td>
-                        <td>Top-tier signal. Still verify geology, siting constraints, and water quality.</td>
-                    </tr>
-                </tbody>
-            </table>
+        <!-- Draggable splitter -->
+        <div class="splitter" id="splitter">
+            <div class="splitter-grip"></div>
         </div>
-    </section>
 
-    <!-- Data Sources -->
-    <section id="data-sources">
-        <div class="container">
-            <h2>Data Sources</h2>
-            <ul class="data-list">
-                <li><span class="name">MERIT Hydro v1.0.1</span> <span class="meta">Elevation, HAND, Upstream Area — 90
-                        m</span></li>
-                <li><span class="name">Depth to Bedrock (DTB)</span> <span class="meta">Shangguan et al. — 250 m</span>
-                </li>
-                <li><span class="name">Global Aridity Index v3.1</span> <span class="meta">Zomer et al. — ~1 km</span>
-                </li>
-                <li><span class="name">Sentinel-2 SR Harmonized</span> <span class="meta">Copernicus / ESA — 10 m</span>
-                </li>
-                <li><span class="name">SoilGrids v2 (ISRIC)</span> <span class="meta">Clay, Sand, CFVO, Bulk Density —
-                        250 m</span></li>
-                <li><span class="name">FAO GAUL 2015</span> <span class="meta">Administrative boundaries (export
-                        only)</span></li>
-            </ul>
+        <!-- Content pane -->
+        <div class="content-pane" id="contentPane">
+
+            <!-- How to Use -->
+            <section id="how-to-use">
+                <div class="container">
+                    <h2>How to Use</h2>
+                    <ol>
+                        <li><strong>Zoom in</strong> to a district or catchment (zoom level ≥ 9 recommended)</li>
+                        <li>Adjust pillar <strong>weights</strong> if needed (Storage / Supply / Yield)</li>
+                        <li>Set the <strong>dry-season NDVI month</strong> for your region (default: September for
+                            Malawi)</li>
+                        <li>Click <strong>RUN</strong> to compute the Groundwater Potential Index</li>
+                        <li><strong>Click any point</strong> on the map for a detailed diagnostic popup</li>
+                        <li>Toggle <strong>pillar layers</strong> in the Layers panel to understand what drives the
+                            score</li>
+                        <li>Enable <strong>Auto-stretch</strong> for better colour contrast at local scale</li>
+                    </ol>
+                </div>
+            </section>
+
+            <!-- Detailed Methodology -->
+            <section id="methodology">
+                <div class="container">
+                    <h2>Methodology: Source–Pathway–Receptor Framework</h2>
+
+                    <p>The Groundwater Potential Index (GWPI) is grounded in the hydrogeological
+                        <strong>Source–Pathway–Receptor</strong> conceptual model, adapted for remote sensing in
+                        data-scarce crystalline basement terrains common across sub-Saharan Africa. Three independently
+                        normalised pillars (0–1) are combined using user-adjustable weights, then multiplied by a
+                        terrain constraint. The final score ranges from 0 to 10.</p>
+
+                    <div class="callout">
+                        <strong>Why this framework?</strong> In crystalline basement aquifers, groundwater occurrence
+                        depends on three independent conditions being met simultaneously: there must be a
+                        <em>receptor</em> (porous weathered rock to store water), a <em>source</em> (enough rainfall
+                        minus evapotranspiration to recharge), and a <em>pathway</em> (fractures and transmissive
+                        materials to deliver water to a borehole). If any one is missing, the borehole will fail.
+                    </div>
+
+                    <!-- Pillar overview cards -->
+                    <div class="pillar-grid">
+                        <div class="pillar-card">
+                            <h3><span class="dot" style="background:var(--storage)"></span> Storage</h3>
+                            <p>The Receptor — how much saturated weathered rock exists below the water table</p>
+                        </div>
+                        <div class="pillar-card">
+                            <h3><span class="dot" style="background:var(--supply)"></span> Supply</h3>
+                            <p>The Source — is there enough climatic moisture surplus to recharge the aquifer</p>
+                        </div>
+                        <div class="pillar-card">
+                            <h3><span class="dot" style="background:var(--yield)"></span> Yield</h3>
+                            <p>The Pathway — can the aquifer transmit water to a borehole via fractures and permeable
+                                soils</p>
+                        </div>
+                        <div class="pillar-card">
+                            <h3><span class="dot" style="background:var(--constraint)"></span> Constraint</h3>
+                            <p>Multiplicative penalty — steep/elevated terrain collapses the score to zero regardless of
+                                pillar values</p>
+                        </div>
+                    </div>
+
+                    <!-- PILLAR 1: STORAGE -->
+                    <h3 style="color:var(--storage)">Pillar 1: Saturated Storage Capacity (The Receptor)</h3>
+
+                    <p>In crystalline basement aquifers, groundwater is primarily hosted in the <strong>weathered
+                            regolith (saprolite)</strong>. The thickness of this saturated weathered zone is the primary
+                        control on how much water the aquifer can store. We estimate this using two globally available
+                        datasets:</p>
+
+                    <ul>
+                        <li><strong>DTB</strong> (Depth to Bedrock, metres) — from a global 250 m dataset (Shangguan et
+                            al. 2017), tells us how deep the weathering goes</li>
+                        <li><strong>HAND</strong> (Height Above Nearest Drainage, metres) — from MERIT Hydro, tells us
+                            how far above the local water table a pixel sits</li>
+                    </ul>
+
+                    <h4>Why DTB − HAND?</h4>
+                    <p>A hilltop with 50 m of DTB may still be <em>dry</em> if it sits 60 m above the nearest stream
+                        (HAND = 60). Subtracting HAND from DTB estimates how much of the weathered zone is likely
+                        <em>saturated</em> — i.e., below the drainage base-level that approximates the water table.</p>
+
+                    <div class="formula">DTB_minus_HAND = DTB − HAND
+                        Storage_raw = clamp(DTB_minus_HAND, 0, 200) // cap outliers
+                        Storage = log(1 + Storage_raw) / log(201) // 0 → 0, 200 → 1</div>
+
+                    <h4>Why log-normalise?</h4>
+                    <p>The raw difference has a long tail — some pixels show >150 m of potential saturated thickness. A
+                        linear scale would compress all the action into the low end. The <strong>log(1+x)</strong>
+                        transform compresses the tail while preserving better discrimination in the critical 0–50 m
+                        range where most boreholes operate. Dividing by log(201) ensures that 200 m maps to exactly 1.0.
+                    </p>
+
+                    <!-- PILLAR 2: SUPPLY -->
+                    <h3 style="color:var(--supply)">Pillar 2: Climatic Supply Flux (The Source)</h3>
+
+                    <p>Groundwater recharge requires a moisture surplus after evapotranspiration is satisfied. We use
+                        two complementary proxies:</p>
+
+                    <ul>
+                        <li><strong>Aridity Index (AI)</strong> — Global Aridity Index v3.1 (FAO-56 Penman-Monteith
+                            reference ET). AI = P/PET, so higher values mean wetter conditions with more potential
+                            recharge</li>
+                        <li><strong>Upstream Drainage Area (UPA)</strong> — from MERIT Hydro (km²). Larger upstream
+                            areas funnel more water to convergence zones, concentrating recharge</li>
+                    </ul>
+
+                    <div class="formula">AI_norm = unitScale(clamp(AI, 0.05, 1.5)) // climate moisture (0–1)
+                        UPA_factor = unitScale(clamp(log10(UPA), −2, 4)) // topographic concentration (0–1)
+                        Supply = AI_norm × UPA_factor // both must be favourable</div>
+
+                    <h4>Why multiply rather than add?</h4>
+                    <p>A wet climate (high AI) still won't deliver much recharge to an isolated ridge with tiny upstream
+                        area. Conversely, a huge catchment in a hyper-arid zone won't help either. The
+                        <strong>product</strong> ensures both conditions must be met — if either is near zero, Supply
+                        collapses.</p>
+
+                    <!-- PILLAR 3: YIELD -->
+                    <h3 style="color:var(--yield)">Pillar 3: Yield & Transmissivity Proxies (The Pathway)</h3>
+
+                    <p>Even with adequate storage and recharge, the aquifer must be able to <em>transmit</em> water to a
+                        borehole. In crystalline basement terrains, this is controlled by fracture networks, soil
+                        permeability, and weathering intensity. We blend five sub-components:</p>
+
+                    <table class="weight-table">
+                        <thead>
+                            <tr>
+                                <th>Component</th>
+                                <th>Weight</th>
+                                <th>Source</th>
+                                <th>Rationale</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="swatch"
+                                        style="background:var(--yield)"></span><strong>FracturesN</strong></td>
+                                <td>28%</td>
+                                <td>Canny edge detection on MERIT elevation + 150 m Gaussian blur</td>
+                                <td>Heuristic proxy for lineaments and fracture damage zones (~100 m wide)</td>
+                            </tr>
+                            <tr>
+                                <td><span class="swatch"
+                                        style="background:var(--yield)"></span><strong>SoilTrans</strong></td>
+                                <td>28%</td>
+                                <td>SoilGrids v2: sand%, clay%, CFVO%, bulk density (depth-weighted 0–60 cm)</td>
+                                <td>Soil hydraulic transmissivity proxy — sandy, coarse soils allow more infiltration
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span class="swatch" style="background:var(--yield)"></span><strong>TPIN</strong>
+                                </td>
+                                <td>16%</td>
+                                <td>elv − focal_mean(elv, 250 m circle)</td>
+                                <td>Topographic Position Index — valleys and convergence zones collect water</td>
+                            </tr>
+                            <tr>
+                                <td><span class="swatch" style="background:var(--yield)"></span><strong>NDVIN</strong>
+                                </td>
+                                <td>16%</td>
+                                <td>Dry-season Sentinel-2 NDVI median (10 m, aggregated)</td>
+                                <td>Phreatophytes as biological sensors — trees that stay green in dry season are
+                                    accessing groundwater</td>
+                            </tr>
+                            <tr>
+                                <td><span class="swatch"
+                                        style="background:var(--yield)"></span><strong>LithFactor</strong></td>
+                                <td>12%</td>
+                                <td>Neutral 0.5 constant (or GFV lithology if enabled)</td>
+                                <td>Lithological prior — does not drive results unless explicitly enabled</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4>FracturesN — Lineament Heuristic</h4>
+                    <p>The Canny edge detector identifies sharp topographic breaks in the MERIT elevation surface that
+                        often correspond to fault traces and fracture zones. The result is convolved with a <strong>150
+                            m Gaussian kernel</strong> to simulate the ~100 m <em>damage zone</em> around each lineament
+                        where fracture permeability is enhanced. This is normalised to 0–1 using the range 0–0.30.</p>
+
+                    <div class="callout warn">
+                        <strong>Limitation:</strong> These are <em>heuristic</em> lineaments derived from topography,
+                        not mapped geological faults. They correlate with real fractures in many settings but should
+                        always be validated against geological maps where available.
+                    </div>
+
+                    <h4>SoilTrans — Soil Transmissivity Proxy</h4>
+                    <p>Uses a depth-weighted average (0–60 cm) of four SoilGrids v2 properties to estimate soil
+                        hydraulic transmissivity:</p>
+                    <div class="formula">SoilPerm = 0.45 × sandN // sand content ↑ = permeability ↑
+                        + 0.20 × cfvoN // coarse fragments ↑ = macro-pores ↑
+                        + 0.25 × (1 − clayN) // clay ↑ = permeability ↓
+                        + 0.10 × (1 − bdodN) // bulk density ↑ = compaction ↑ = permeability ↓</div>
+
+                    <h4>NDVIN — Dry-Season Vegetation as a Biological Sensor</h4>
+                    <p>In the late dry season, most vegetation has senesced. Trees and shrubs that remain
+                        <strong>green</strong> are likely <em>phreatophytes</em> — species with root systems tapping
+                        shallow groundwater. Sentinel-2 NDVI is computed at 10 m resolution from a cloud-masked median
+                        composite, then aggregated and normalised (0.05–0.60 → 0–1). This is one of the most powerful
+                        signals in data-scarce settings.</p>
+
+                    <h4>Yield Combination</h4>
+                    <div class="formula">Yield = 0.28×FracturesN + 0.16×TPIN + 0.16×NDVIN + 0.28×SoilTrans +
+                        0.12×LithFactor</div>
+
+                    <!-- CONSTRAINT -->
+                    <h3 style="color:var(--constraint)">Terrain Constraint: Rejecting the "Additive Fallacy"</h3>
+
+                    <p>Many groundwater potential maps use purely <strong>additive</strong> models. This creates a
+                        dangerous failure mode: mountainous terrain scores highly because fracture density and slope
+                        features add positive signal. But in steep rocky terrain, gravity moves water as <em>surface
+                            runoff</em> before it can infiltrate.</p>
+
+                    <div class="callout warn">
+                        <strong>The Additive Fallacy:</strong> In an additive model, a mountain pixel might score:
+                        Fractures (high) + Slope feature (positive) + Soil (moderate) = Medium-High. This is
+                        <em>dangerously misleading</em> — that mountain sheds water as runoff, it does not store or
+                        transmit groundwater.
+                    </div>
+
+                    <p>The solution is a <strong>multiplicative penalty</strong> that can drive the score to zero
+                        regardless of pillar values:</p>
+
+                    <div class="formula">Penalty = exp(−0.15 × slope°) × exp(−0.1 × HAND_m)</div>
+
+                    <table class="weight-table">
+                        <thead>
+                            <tr>
+                                <th>Terrain Type</th>
+                                <th>Slope</th>
+                                <th>HAND</th>
+                                <th>Penalty</th>
+                                <th>Effect</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Flat valley floor</td>
+                                <td>2°</td>
+                                <td>3 m</td>
+                                <td>≈ 0.95</td>
+                                <td>Pillars dominate</td>
+                            </tr>
+                            <tr>
+                                <td>Gentle hillslope</td>
+                                <td>8°</td>
+                                <td>15 m</td>
+                                <td>≈ 0.45</td>
+                                <td>Moderate suppression</td>
+                            </tr>
+                            <tr>
+                                <td>Steep hillslope</td>
+                                <td>15°</td>
+                                <td>40 m</td>
+                                <td>≈ 0.07</td>
+                                <td>Strong suppression</td>
+                            </tr>
+                            <tr>
+                                <td>Mountain ridge</td>
+                                <td>25°</td>
+                                <td>80 m</td>
+                                <td>≈ 0.001</td>
+                                <td>Score ≈ zero</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- FINAL SCORE -->
+                    <h3>Final Score (0–10)</h3>
+
+                    <div class="formula">Score = 10 × (w_Storage × Storage + w_Supply × Supply + w_Yield × Yield) ×
+                        Penalty
+
+                        Default weights: Storage 40%, Supply 30%, Yield 30%
+                        Weights are user-adjustable and normalised to sum to 1</div>
+
+                    <p>The factor of 10 maps the 0–1 weighted sum into a more intuitive 0–10 range. The multiplicative
+                        penalty ensures that no amount of positive pillar signal can overcome genuinely unfavourable
+                        terrain.</p>
+
+                </div>
+            </section>
+
+            <!-- Score Interpretation -->
+            <section id="interpretation">
+                <div class="container">
+                    <h2>Score Interpretation</h2>
+                    <table class="score-table">
+                        <thead>
+                            <tr>
+                                <th>Score</th>
+                                <th>Class</th>
+                                <th>Guidance</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="swatch" style="background:#e51f1f"></span>0 – 2.0</td>
+                                <td>Very Low</td>
+                                <td>Low combined evidence. De-prioritise unless strong local knowledge exists.</td>
+                            </tr>
+                            <tr>
+                                <td><span class="swatch" style="background:#f2a134"></span>2.0 – 3.5</td>
+                                <td>Low</td>
+                                <td>Some signal, but weak. Cross-reference with borehole logs before acting.</td>
+                            </tr>
+                            <tr>
+                                <td><span class="swatch" style="background:#f7e379"></span>3.5 – 5.0</td>
+                                <td>Medium</td>
+                                <td>Promising. Identify which pillar(s) are driving the score and verify locally.</td>
+                            </tr>
+                            <tr>
+                                <td><span class="swatch" style="background:#bbdb44"></span>5.0 – 6.2</td>
+                                <td>High</td>
+                                <td>Strong screening signal. Good candidate for geophysical survey + test borehole.</td>
+                            </tr>
+                            <tr>
+                                <td><span class="swatch" style="background:#44ce1b"></span>6.2 – 10</td>
+                                <td>Exceptional</td>
+                                <td>Top-tier signal. Still verify geology, siting constraints, and water quality.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="callout warn" style="margin-top:16px">
+                        <strong>A high score is a hypothesis, not a guarantee.</strong> Always verify with the pillar
+                        layers (toggle them on in the map) and field data before investing in drilling. The index does
+                        not assess water quality (fluoride, arsenic, salinity).
+                    </div>
+                </div>
+            </section>
+
+            <!-- Data Sources -->
+            <section id="data-sources">
+                <div class="container">
+                    <h2>Data Sources</h2>
+                    <ul class="data-list">
+                        <li><span class="name">MERIT Hydro v1.0.1</span> <span class="meta">Elevation, HAND, Upstream
+                                Area — 90 m · Yamazaki et al. 2019</span></li>
+                        <li><span class="name">Depth to Bedrock (DTB)</span> <span class="meta">Global 250 m · Shangguan
+                                et al. 2017</span></li>
+                        <li><span class="name">Global Aridity Index v3.1</span> <span class="meta">FAO-56 PM reference
+                                ET · ~1 km · Zomer et al. 2022</span></li>
+                        <li><span class="name">Sentinel-2 SR Harmonized</span> <span class="meta">10 m multispectral ·
+                                Copernicus / ESA · 2024–2025</span></li>
+                        <li><span class="name">SoilGrids v2 (ISRIC)</span> <span class="meta">Clay, Sand, CFVO, Bulk
+                                Density — 250 m · Poggio et al. 2021</span></li>
+                        <li><span class="name">FAO GAUL 2015</span> <span class="meta">Administrative boundaries
+                                (national export only)</span></li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Limitations -->
+            <section id="limitations">
+                <div class="container">
+                    <h2>Limitations</h2>
+                    <ul>
+                        <li><strong>Screening tool only</strong> — not a substitute for hydrogeological investigation,
+                            geophysics, or test drilling</li>
+                        <li><strong>Resolution ceiling:</strong> limited by the coarsest input (DTB and SoilGrids at 250
+                            m)</li>
+                        <li><strong>Fracture proxy is heuristic</strong> — Canny edges on elevation are not mapped
+                            geological faults</li>
+                        <li><strong>Static climate proxy</strong> — Aridity Index is a long-term average, not
+                            year-specific recharge</li>
+                        <li><strong>Neutral lithology</strong> — LithFactor defaults to 0.5; geology does not
+                            differentiate the score unless GFV layers are enabled</li>
+                        <li><strong>NDVI seasonality</strong> — the dry-season month must be set correctly for each
+                            region (default: September for Malawi)</li>
+                        <li><strong>No water quality component</strong> — high index ≠ potable water (fluoride, arsenic,
+                            salinity not assessed)</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Footer -->
+            <footer>
+                <p>
+                    <a href="https://washways.org">WASHways</a> ·
+                    <a href="https://github.com/washways/GroundwaterDiscoveryPortal">GitHub</a> ·
+                    MIT License · 2026
+                </p>
+                <p style="margin-top:6px;">This is a screening tool — always verify results with hydrogeological field
+                    investigation.</p>
+            </footer>
         </div>
-    </section>
+    </div>
 
-    <!-- Footer -->
-    <footer>
-        <p>
-            <a href="https://washways.org">WASHways</a> ·
-            <a href="https://github.com/washways/GroundwaterDiscoveryPortal">GitHub</a> ·
-            MIT License · 2026
-        </p>
-        <p style="margin-top:8px;">This is a screening tool — always verify results with hydrogeological field
-            investigation.</p>
-    </footer>
+    <!-- Splitter logic -->
+    <script>
+        (function () {
+            const container = document.getElementById('splitContainer');
+            const mapPane = document.getElementById('mapPane');
+            const splitter = document.getElementById('splitter');
+            const content = document.getElementById('contentPane');
 
+            let dragging = false;
+            let startY = 0;
+            let startH = 0;
+
+            // Default: map takes 60% of available height
+            function initSplit() {
+                const h = container.offsetHeight;
+                const mapH = Math.round(h * 0.6);
+                mapPane.style.height = mapH + 'px';
+                content.style.height = (h - mapH - splitter.offsetHeight) + 'px';
+            }
+
+            splitter.addEventListener('mousedown', function (e) {
+                e.preventDefault();
+                dragging = true;
+                startY = e.clientY;
+                startH = mapPane.offsetHeight;
+                splitter.classList.add('active');
+                document.body.style.cursor = 'row-resize';
+                document.body.style.userSelect = 'none';
+                // Prevent iframe from stealing events
+                mapPane.querySelector('iframe').style.pointerEvents = 'none';
+            });
+
+            document.addEventListener('mousemove', function (e) {
+                if (!dragging) return;
+                const dy = e.clientY - startY;
+                const totalH = container.offsetHeight - splitter.offsetHeight;
+                const newMapH = Math.max(80, Math.min(totalH - 80, startH + dy));
+                mapPane.style.height = newMapH + 'px';
+                content.style.height = (totalH - newMapH) + 'px';
+            });
+
+            document.addEventListener('mouseup', function () {
+                if (!dragging) return;
+                dragging = false;
+                splitter.classList.remove('active');
+                document.body.style.cursor = '';
+                document.body.style.userSelect = '';
+                mapPane.querySelector('iframe').style.pointerEvents = '';
+            });
+
+            // Touch support
+            splitter.addEventListener('touchstart', function (e) {
+                e.preventDefault();
+                dragging = true;
+                startY = e.touches[0].clientY;
+                startH = mapPane.offsetHeight;
+                splitter.classList.add('active');
+                mapPane.querySelector('iframe').style.pointerEvents = 'none';
+            }, { passive: false });
+
+            document.addEventListener('touchmove', function (e) {
+                if (!dragging) return;
+                const dy = e.touches[0].clientY - startY;
+                const totalH = container.offsetHeight - splitter.offsetHeight;
+                const newMapH = Math.max(80, Math.min(totalH - 80, startH + dy));
+                mapPane.style.height = newMapH + 'px';
+                content.style.height = (totalH - newMapH) + 'px';
+            }, { passive: true });
+
+            document.addEventListener('touchend', function () {
+                if (!dragging) return;
+                dragging = false;
+                splitter.classList.remove('active');
+                mapPane.querySelector('iframe').style.pointerEvents = '';
+            });
+
+            window.addEventListener('resize', initSplit);
+            initSplit();
+        })();
+    </script>
 </body>
 
 </html>
