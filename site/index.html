@@ -11,11 +11,16 @@
     <meta property="og:description"
         content="Screen for groundwater potential using satellite-derived Storage, Supply, and Yield pillars with a terrain constraint — all in your browser.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://washways.org/GroundwaterDiscoveryPortal/">
+    <meta property="og:url" content="https://washways.org/GroundwaterDiscoveryPortal">
+    <meta property="og:image" content="https://washways.org/GroundwaterDiscoveryPortal/social-preview.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:type" content="image/png">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Groundwater Discovery Portal — WASHways">
     <meta name="twitter:description"
         content="Remote-sensing groundwater potential screening tool powered by Google Earth Engine.">
+    <meta name="twitter:image" content="https://washways.org/GroundwaterDiscoveryPortal/social-preview.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -511,7 +516,8 @@
                         <strong>Source–Pathway–Receptor</strong> conceptual model, adapted for remote sensing in
                         data-scarce crystalline basement terrains common across sub-Saharan Africa. Three independently
                         normalised pillars (0–1) are combined using user-adjustable weights, then multiplied by a
-                        terrain constraint. The final score ranges from 0 to 10.</p>
+                        terrain constraint. The final score ranges from 0 to 10.
+                    </p>
 
                     <div class="callout">
                         <strong>Why this framework?</strong> In crystalline basement aquifers, groundwater occurrence
@@ -561,7 +567,8 @@
                     <h4>Why DTB − HAND?</h4>
                     <p>A hilltop with 50 m of DTB may still be <em>dry</em> if it sits 60 m above the nearest stream
                         (HAND = 60). Subtracting HAND from DTB estimates how much of the weathered zone is likely
-                        <em>saturated</em> — i.e., below the drainage base-level that approximates the water table.</p>
+                        <em>saturated</em> — i.e., below the drainage base-level that approximates the water table.
+                    </p>
 
                     <div class="formula">DTB_minus_HAND = DTB − HAND
                         Storage_raw = clamp(DTB_minus_HAND, 0, 200) // cap outliers
@@ -596,7 +603,8 @@
                     <p>A wet climate (high AI) still won't deliver much recharge to an isolated ridge with tiny upstream
                         area. Conversely, a huge catchment in a hyper-arid zone won't help either. The
                         <strong>product</strong> ensures both conditions must be met — if either is near zero, Supply
-                        collapses.</p>
+                        collapses.
+                    </p>
 
                     <!-- PILLAR 3: YIELD -->
                     <h3 style="color:var(--yield)">Pillar 3: Yield & Transmissivity Proxies (The Pathway)</h3>
@@ -680,7 +688,8 @@
                         <strong>green</strong> are likely <em>phreatophytes</em> — species with root systems tapping
                         shallow groundwater. Sentinel-2 NDVI is computed at 10 m resolution from a cloud-masked median
                         composite, then aggregated and normalised (0.05–0.60 → 0–1). This is one of the most powerful
-                        signals in data-scarce settings.</p>
+                        signals in data-scarce settings.
+                    </p>
 
                     <h4>Yield Combination</h4>
                     <div class="formula">Yield = 0.28×FracturesN + 0.16×TPIN + 0.16×NDVIN + 0.28×SoilTrans +
